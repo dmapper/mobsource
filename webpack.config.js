@@ -11,7 +11,7 @@ module.exports = env => {
   return ({
     entry: './src/app.js',
     output: {
-      path: path.resolve(__dirname, './'),
+      path: path.resolve(__dirname, 'public', './'),
       filename: outputJS
     },
     devtool: production ? false : 'source-map',
@@ -51,6 +51,7 @@ module.exports = env => {
     },
     devServer: {
       historyApiFallback: true,
+      contentBase: path.join(__dirname, "public"),
       stats: {
         version: false,
         modules: false,
