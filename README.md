@@ -8,7 +8,7 @@ git clone https://github.com/dmapper/mobsource.git
 ### Development
 ```
 npm install
-npm start
+npm dev
 Open http://localhost:3000
 ```
 ### Build
