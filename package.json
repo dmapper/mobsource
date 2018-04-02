@@ -11,7 +11,10 @@
   "author": "",
   "scripts": {
     "start": "webpack-dev-server --hot --inline --module-bind 'css=style!css'",
-    "build": "webpack -p --env production"
+    "build": "webpack -p --env production",
+    "gmp": "npm run -s git-merge-production",
+    "git-merge-production": "git checkout production && git pull origin production && git merge master && git push origin production && git checkout master || (git checkout master && echo '>' && echo '> !!!!! FAILED !!!!! DO THE MERGE MANUALLY !!!!!!!!!!!' && echo '>' && exit 1)",
+    "deploy-prod": "git push deis-prod production"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
