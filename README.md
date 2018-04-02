@@ -27,12 +27,14 @@ npm run build
 ```
 ### # Install Deis Workflow client
 
-Instruction [here](https://deis.com/docs/workflow/quickstart/install-cli-tools/). Skip `Helm Installation and Step 2: Boot a Kubernetes Cluster and Install Deis Workflow`
+Instruction [here](https://deis.com/docs/workflow/quickstart/install-cli-tools/).
+Skip `Helm Installation and Step 2: Boot a Kubernetes Cluster and Install Deis Workflow`
 
 ### # Register and login in the Deis Controller
 
 Deis controller address: http://deis.35.185.88.179.nip.io
-Instruction [here](https://deis.com/docs/workflow/users/registration/). Skip `Registering New Users and next sections`.
+Instruction [here](https://deis.com/docs/workflow/users/registration/).
+Skip `Registering New Users and next sections`.
 
 ### # Add your ssh key to the Deis Controller.
 
