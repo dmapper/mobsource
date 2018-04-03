@@ -1,5 +1,8 @@
 module.exports = {
   "env": {
+    "node": true,
+    "es6": true,
+    "mongo": true,
     "browser": true,
     "es6": true
   },
@@ -47,6 +50,6 @@ module.exports = {
     "arrow-parens": ["error", "as-needed"],
     "camelcase": "warn",
     "vars-on-top": 1,
-    "no-console": 1
+    "no-console": 0
   }
 };

@@ -69,7 +69,11 @@ export default class Home extends React.Component {
     this.setState({isAuth: false, userName: ''})
   }
   clear = () => {
-
+    this.setState({res: {
+      option1: 0,
+      option2: 0,
+      option3: 0
+    }})
   }
   render () {
     return (
@@ -93,24 +97,20 @@ export default class Home extends React.Component {
             : <button onClick={this.handleModalSignIn} className='sing-in'>Sign In</button>}
         </div>
         <div className='data'>
-          {this.state.data.map((item, k) => {
-            return (
-              <div key={k}>
-                <h1 className='question'>{item.question}</h1>
-                <div>
-                  {item.answers.map((i, k) => {
-                    return (
-                      <div key={k} className='answer'>
-                        <input type='radio' name={item.question} value={i.isCorrect} ref={k} disabled={this.state.disabled}
-                          onClick={() => this.setState({disabled: true})}
-                        />{i.label}<div className='result'>{this.state.res[`option${k + 1}`]}</div><br />
-                      </div>
-                    )
-                  })}
-                </div>
+          {this.state.data.map((item, k) => (
+            <div key={k}>
+              <h1 className='question'>{item.question}</h1>
+              <div>
+                {item.answers.map((i, k) => (
+                  <div key={k} className='answer'>
+                    <input type='radio' name={item.question} value={i.isCorrect} ref={k} disabled={this.state.disabled}
+                      onClick={() => this.setState({disabled: true})}
+                    />{i.label}<div className='result'>{this.state.res[`option${k + 1}`]}</div><br />
+                  </div>
+                ))}
               </div>
-            )
-          })}
+            </div>
+          ))}
           <div className='online-wrap'>
             <h1>Online:</h1>
             <h1 className='count'>10</h1>

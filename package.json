@@ -10,6 +10,7 @@
   "license": "ISC",
   "author": "",
   "scripts": {
+    "api": "nodemon ./server.js --exec babel-node --presets env,stage-0",
     "dev": "webpack-dev-server --hot --inline --module-bind 'css=style!css'",
     "build": "webpack -p --env production",
     "gmp": "npm run -s git-merge-production",
@@ -45,5 +46,21 @@
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4",
     "express": "^4.16.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "eslint": "^4.19.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "body-parser": "^1.18.2",
+    "nodemon": "^1.17.3",
+    "express": "^4.16.3",
+    "mongodb": "^3.0.5"
   }
 }
