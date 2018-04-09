@@ -1,6 +1,6 @@
-import Main from './pages/Main/Main.jsx'
 import ReactDOM from 'react-dom'
+import Home from './pages/Home'
 import React from 'react'
 import './app.styl'
 
-ReactDOM.render(<Main />, document.getElementById('root'))
+ReactDOM.render(<Home />, document.getElementById('root'))

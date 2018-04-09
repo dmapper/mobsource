@@ -12,6 +12,7 @@
   "scripts": {
     "api": "nodemon ./server.js --exec babel-node --presets env,stage-0",
     "dev": "webpack-dev-server --hot --inline --module-bind 'css=style!css'",
+    "build_dev": "webpack -p",
     "build": "webpack -p --env production",
     "gmp": "npm run -s git-merge-production",
     "git-merge-production": "git checkout production && git pull origin production && git merge master && git push origin production && git checkout master || (git checkout master && echo '>' && echo '> !!!!! FAILED !!!!! DO THE MERGE MANUALLY !!!!!!!!!!!' && echo '>' && exit 1)",
@@ -34,18 +35,20 @@
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-react": "^7.4.0",
     "eslint-plugin-standard": "^3.0.1",
+    "express": "^4.16.3",
     "extract-text-webpack-plugin": "^3.0.2",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-cookies": "^0.1.0",
     "react-dom": "^16.2.0",
+    "socket.io": "^2.1.0",
+    "socket.io-client": "^2.1.0",
     "style-loader": "^0.19.0",
     "stylint": "^1.5.9",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "webpack": "^3.8.1",
-    "webpack-dev-server": "^2.9.4",
-    "express": "^4.16.3"
+    "webpack-dev-server": "^2.9.4"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

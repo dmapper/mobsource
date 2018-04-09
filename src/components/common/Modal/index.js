@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import './Modal.styl'
+import './style.styl'
 
 export default class Modal extends React.Component {
   constructor () {

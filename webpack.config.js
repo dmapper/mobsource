@@ -2,7 +2,9 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const webpack = require('webpack')
 const path = require('path')
 const alias = {
-  'components': path.resolve('./src/components')
+  'components': path.resolve('./src/components'),
+  'consts': path.resolve('./src/consts'),
+  'utils': path.resolve('./src/utils')
 }
 module.exports = env => {
   const production = env === 'production'
@@ -51,14 +53,14 @@ module.exports = env => {
     },
     devServer: {
       historyApiFallback: true,
-      contentBase: path.join(__dirname, "public"),
+      contentBase: path.join(__dirname, 'public'),
       stats: {
         version: false,
         modules: false,
         assets: false,
         hash: false
       },
-      port: '3000'
+      port: '3001'
     },
     plugins: [
       new ExtractTextPlugin(outputCSS),

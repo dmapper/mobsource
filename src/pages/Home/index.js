@@ -1,21 +1,20 @@
-import Modal from 'components/Modal/Modal.jsx'
+import ModalSignIn from 'components/ModalSignIn'
+import ModalSignUp from 'components/ModalSignUp'
+import { prefix } from 'consts/routes'
 import cookie from 'react-cookies'
+import io from 'socket.io-client'
 import React from 'react'
-import './Main.styl'
-const admin = {
-  name: 'Admin',
-  login: 'admin',
-  password: 'admin'
-}
+import './style.styl'
+const socket = io(prefix)
 
 export default class Home extends React.Component {
   state = {
+    isOpenModalSignUp: false,
     isOpenModalSignIn: false,
     disabled: false,
     isAuth: false,
     userName: '',
-    password: '',
-    login: '',
+    online: 0,
     data: [
       {
         question: 'Please select a choice only if you are confident of your response',
@@ -38,6 +37,7 @@ export default class Home extends React.Component {
       option2: 30,
       option3: 50
     }
+
   }
   check = e => {
     if (e.key < 4 && e.key > 0) {
@@ -47,21 +47,21 @@ export default class Home extends React.Component {
     }
   }
   componentWillMount = () => {
+    const geOnline = () => {
+      socket.emit('update', () => 'asdfasdf')
+      socket.on('online', online => this.setState({online}))
+    }
+    geOnline()
+    setInterval(() => geOnline(), 1000)
     document.addEventListener('keyup', this.check, false)
-    if (cookie.load('auth')) {
-      this.setState({isAuth: true, userName: admin.name})
+    const auth = cookie.load('auth')
+    if (auth) {
+      this.setState({isAuth: true, userName: auth})
     }
   }
   componentDidUpdate = () => {
     if (this.state.disabled) {
       document.removeEventListener('keyup', this.check, false)
-    }
-  }
-  handleModalSignIn = () => this.setState({isOpenModalSignIn: !this.state.isOpenModalSignIn})
-  signIn = () => {
-    if (this.state.login === admin.login && this.state.password === admin.password) {
-      cookie.save('auth', true)
-      this.setState({isAuth: true, userName: admin.name}, () => this.handleModalSignIn())
     }
   }
   loguot = () => {
@@ -75,23 +75,18 @@ export default class Home extends React.Component {
       option3: 0
     }})
   }
+  handleModalSignUp = () => this.setState({isOpenModalSignUp: !this.state.isOpenModalSignUp})
+  handleModalSignIn = () => this.setState({isOpenModalSignIn: !this.state.isOpenModalSignIn})
   render () {
     return (
       <div id='main'>
-        <Modal show={this.state.isOpenModalSignIn} onHide={this.handleModalSignIn}>
-          <div className='modal-header'>
-            <h1>Sign In</h1>
-          </div>
-          <div className='modal-body'>
-            <input type='text' placeholder='Login' value={this.state.login} onChange={e => this.setState({login: e.target.value})} />
-            <input type='password' placeholder='Password' value={this.state.password} onChange={e => this.setState({password: e.target.value})} />
-            <div className='button-wrap'>
-              <button onClick={this.signIn} className='sing-in'>Sign In</button>
-            </div>
-          </div>
-        </Modal>
+        <ModalSignUp isOpenModalSignUp={this.state.isOpenModalSignUp} handleModalSignUp={this.handleModalSignUp} />
+        <ModalSignIn isOpenModalSignIn={this.state.isOpenModalSignIn} handleModalSignIn={this.handleModalSignIn}
+          success={userName => this.setState({isAuth: true, userName})} />
         <div className='header'>
-          <h1>{this.state.userName}</h1>
+          {this.state.isAuth
+            ? <h1>{this.state.userName}</h1>
+            : <button onClick={this.handleModalSignUp} className='sing-up'>Sign Up</button>}
           {this.state.isAuth
             ? <button onClick={this.loguot} className='sing-in'>Logout</button>
             : <button onClick={this.handleModalSignIn} className='sing-in'>Sign In</button>}
@@ -113,7 +108,7 @@ export default class Home extends React.Component {
           ))}
           <div className='online-wrap'>
             <h1>Online:</h1>
-            <h1 className='count'>10</h1>
+            <h1 className='count'>{this.state.online}</h1>
           </div>
         </div>
         {this.state.isAuth && <div className='clear-button-wrap'>
