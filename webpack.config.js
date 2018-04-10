@@ -7,7 +7,7 @@ const alias = {
   'utils': path.resolve('./src/utils')
 }
 module.exports = env => {
-  const production = env === 'production'
+  // const production = env === 'production'
   let outputCSS = 'bundle.css'
   let outputJS = 'bundle.js'
   return ({
@@ -16,7 +16,7 @@ module.exports = env => {
       path: path.resolve(__dirname, 'public', './'),
       filename: outputJS
     },
-    devtool: production ? false : 'source-map',
+    devtool: false, // production ? false : 'source-map',
     module: {
       rules: [
         {

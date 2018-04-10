@@ -1,12 +1,14 @@
+import { API_VOTE, prefix, API_GET_USER } from 'consts/routes'
 import ModalSignIn from 'components/ModalSignIn'
 import ModalSignUp from 'components/ModalSignUp'
-import { prefix } from 'consts/routes'
 import cookie from 'react-cookies'
 import io from 'socket.io-client'
+import req from 'utils/req'
 import React from 'react'
 import './style.styl'
-const socket = io(prefix)
+let socket = io(prefix)
 
+const admin = 'admin'
 export default class Home extends React.Component {
   state = {
     isOpenModalSignUp: false,
@@ -21,42 +23,74 @@ export default class Home extends React.Component {
         answers: [
           {
             label: 'option 1',
-            isCorrect: true
+            value: 1
           },
           {
-            label: 'option 2'
+            label: 'option 2',
+            value: 2
           },
           {
-            label: 'option 3'
+            label: 'option 3',
+            value: 3
           }
         ]
       }
     ],
     res: {
-      option1: 20,
-      option2: 30,
-      option3: 50
+      option1: 0,
+      option2: 0,
+      option3: 0
     }
 
   }
-  check = e => {
-    if (e.key < 4 && e.key > 0) {
-      this.setState({disabled: true}, () => {
-        this.refs[e.key].checked = true
+  vote = e => {
+    req.post(API_VOTE, {option: e, user_id: this.state.id}, true)
+      .then(r => {
+        if (r.message === 'User voted successfully') {
+          console.log(r.result)
+          this.setState({res: {
+            option1: r.result.o1,
+            option2: r.result.o2,
+            option3: r.result.o3
+          },
+          disabled: true}, () => { this.refs[e - 1].checked = true })
+        } else if (r.message === 'User already voted') {
+          this.setState({disabled: true}, () => { this.refs[e - 1].checked = true })
+        }
       })
+  }
+  check = e => {
+    console.log('check')
+    if (e.key < 4 && e.key > 0) {
+      this.vote(e.key)
     }
   }
   componentWillMount = () => {
-    const geOnline = () => {
-      socket.emit('update', () => 'asdfasdf')
-      socket.on('online', online => this.setState({online}))
+    const geData = () => {
+      socket.emit('update', () => { })
+      socket.on('data', obj => {
+        this.setState({
+          online: obj.online,
+          res: {
+            option1: obj.res.o1,
+            option2: obj.res.o2,
+            option3: obj.res.o3
+          }})
+        // console.log(obj.res)
+      }
+      )
     }
-    geOnline()
-    setInterval(() => geOnline(), 1000)
+    geData()
+    setInterval(() => geData(), 3000)
     document.addEventListener('keyup', this.check, false)
     const auth = cookie.load('auth')
     if (auth) {
-      this.setState({isAuth: true, userName: auth})
+      req.get(API_GET_USER.replace('{id}', auth))
+        .then(r => {
+          if (r.message === 'Successfully') {
+            this.setState({isAuth: true, userName: r.login, id: auth})
+          }
+        })
     }
   }
   componentDidUpdate = () => {
@@ -66,14 +100,21 @@ export default class Home extends React.Component {
   }
   loguot = () => {
     cookie.remove('auth')
-    this.setState({isAuth: false, userName: ''})
+    this.setState({disabled: false, isAuth: false, userName: ''})
   }
   clear = () => {
-    this.setState({res: {
-      option1: 0,
-      option2: 0,
-      option3: 0
-    }})
+    req.delete(API_VOTE).then(r => {
+      if (r.message === 'Voting results are deleted') {
+        this.setState({
+          disabled: false,
+          res: {
+            option1: 0,
+            option2: 0,
+            option3: 0
+          }})
+        console.log('succes')
+      }
+    })
   }
   handleModalSignUp = () => this.setState({isOpenModalSignUp: !this.state.isOpenModalSignUp})
   handleModalSignIn = () => this.setState({isOpenModalSignIn: !this.state.isOpenModalSignIn})
@@ -82,7 +123,7 @@ export default class Home extends React.Component {
       <div id='main'>
         <ModalSignUp isOpenModalSignUp={this.state.isOpenModalSignUp} handleModalSignUp={this.handleModalSignUp} />
         <ModalSignIn isOpenModalSignIn={this.state.isOpenModalSignIn} handleModalSignIn={this.handleModalSignIn}
-          success={userName => this.setState({isAuth: true, userName})} />
+          success={(userName, id) => this.setState({isAuth: true, userName, id})} />
         <div className='header'>
           {this.state.isAuth
             ? <h1>{this.state.userName}</h1>
@@ -91,7 +132,7 @@ export default class Home extends React.Component {
             ? <button onClick={this.loguot} className='sing-in'>Logout</button>
             : <button onClick={this.handleModalSignIn} className='sing-in'>Sign In</button>}
         </div>
-        <div className='data'>
+        {this.state.isAuth && <div className='data'>
           {this.state.data.map((item, k) => (
             <div key={k}>
               <h1 className='question'>{item.question}</h1>
@@ -99,7 +140,7 @@ export default class Home extends React.Component {
                 {item.answers.map((i, k) => (
                   <div key={k} className='answer'>
                     <input type='radio' name={item.question} value={i.isCorrect} ref={k} disabled={this.state.disabled}
-                      onClick={() => this.setState({disabled: true})}
+                      onClick={() => this.vote(k + 1)}
                     />{i.label}<div className='result'>{this.state.res[`option${k + 1}`]}</div><br />
                   </div>
                 ))}
@@ -110,8 +151,8 @@ export default class Home extends React.Component {
             <h1>Online:</h1>
             <h1 className='count'>{this.state.online}</h1>
           </div>
-        </div>
-        {this.state.isAuth && <div className='clear-button-wrap'>
+        </div>}
+        {this.state.userName === admin && <div className='clear-button-wrap'>
           <button onClick={this.clear}>Clear Results</button>
         </div>}
       </div>

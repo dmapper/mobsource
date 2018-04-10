@@ -7,13 +7,19 @@ git clone https://github.com/dmapper/mobsource.git
 ```
 ### Development
 ```
-npm install
-npm dev
-Open http://localhost:3000
+npm i
+npm run dev
+Open http://localhost:3001
 ```
 ### Build
 ```
-npm run build
+npm run build_dev
+npm run build_prod
+```
+### Watch
+```
+npm run start
+Open http://localhost:3000
 ```
 
 # How to deploy:

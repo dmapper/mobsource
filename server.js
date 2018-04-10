@@ -1,5 +1,4 @@
-// import { ObjectID } from 'mongodb'
-import { MongoClient } from 'mongodb'
+import { MongoClient, ObjectID } from 'mongodb'
 import bodyParser from 'body-parser'
 import express from 'express'
 const app = express()
@@ -14,13 +13,32 @@ app.use(express.static(path.join(__dirname, '/public')))
 app.get('/', function (request, response) {
   response.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 })
+let res = {o1: 0, o2: 0, o3: 0}
+const data = cb => {
+  db.collection('votes').find({ }).toArray((err, docsres) => {
+    if (err) {
+      console.log(err)
+    } else {
+      let o1 = 0
+      let o2 = 0
+      let o3 = 0
+      docsres.forEach(i => {
+        if (+i.option === 1) o1++
+        if (+i.option === 2) o2++
+        if (+i.option === 3) o3++
+      })
+      res = {o1, o2, o3}
+      cb && cb(res)
+    }
+  })
+}
 io.on('connection', socket => {
-  socket.emit('online', io.engine.clientsCount)
+  socket.emit('data', { online: io.engine.clientsCount, res })
   socket.on('disconnect', () => {
-    socket.emit('online', io.engine.clientsCount)
+    socket.emit('data', { online: io.engine.clientsCount, res })
   })
   socket.on('update', () => {
-    socket.emit('online', io.engine.clientsCount)
+    socket.emit('data', { online: io.engine.clientsCount, res })
   })
 })
 
@@ -30,6 +48,7 @@ app.use(bodyParser.json())
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3001')
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE')
   next()
 })
 
@@ -42,7 +61,7 @@ app.get('/signin', (req, res) => {
       if (docs === null) {
         res.send({message: 'User not found'})
       } else {
-        res.send({id: docs._id, login: docs.login})
+        res.send({message: 'Successfully', id: docs._id, login: docs.login})
       }
     }
   })
@@ -64,31 +83,55 @@ app.post('/signup', (req, res) => {
           }
         })
       } else {
-        res.send({message: 'User alredy exist'})
+        res.send({message: 'User already exist'})
       }
     }
   })
 })
 
-// app.get('/user/:id', (req, res) => {
-//   db.collection('users').findOne({_id: ObjectID(req.params.id)}, (err, docs) => {
-//     if (err) {
-//       console.log(err)
-//       return res.sendStatus(500)
-//     }
-//     res.send(docs)
-//   })
-// })
-//
-// app.get('/users', (req, res) => {
-//   db.collection('users').find().toArray((err, docs) => {
-//     if (err) {
-//       console.log(err)
-//       return res.sendStatus(500)
-//     }
-//     res.send(docs)
-//   })
-// })
+app.post('/vote', (req, res) => {
+  db.collection('votes').findOne({user_id: req.body.user_id}, (err, docs) => {
+    if (err) {
+      console.log(err)
+      return res.sendStatus(500)
+    } else {
+      if (docs === null) {
+        db.collection('votes').insert({option: req.body.option, user_id: req.body.user_id}, async err => {
+          if (err) {
+            console.log(err)
+            return res.sendStatus(500)
+          } else {
+            data(result => res.send({message: 'User voted successfully', result}))
+          }
+        })
+      } else {
+        res.send({message: 'User already voted'})
+      }
+    }
+  })
+})
+app.delete('/vote', (req, res) => {
+  db.collection('votes').remove({ }, err => {
+    if (err) {
+      console.log(err)
+      return res.sendStatus(500)
+    } else {
+      data()
+      res.send({message: 'Voting results are deleted'})
+    }
+  })
+})
+
+app.get('/user/:id', (req, res) => {
+  db.collection('users').findOne({_id: ObjectID(req.params.id)}, (err, docs) => {
+    if (err) {
+      console.log(err)
+      return res.sendStatus(500)
+    } else {
+      res.send({message: 'Successfully', login: docs.login})
+    }
+  })
+})
 
 MongoClient.connect('mongodb://localhost:27017/mobsource', (err, database) => {
   if (err) return console.log(err)

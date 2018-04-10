@@ -19,9 +19,9 @@ export default class ModalSignIn extends React.Component {
   signIn = () => {
     req.get(API_SIGNIN, {login: this.state.login, password: btoa(this.state.password)})
       .then(r => {
-        if (r.id) {
-          cookie.save('auth', r.login)
-          this.props.success(r.login)
+        if (r.message === 'Successfully') {
+          cookie.save('auth', r.id)
+          this.props.success(r.login, r.id)
           this.props.handleModalSignIn()
         }
       })
