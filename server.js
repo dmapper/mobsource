@@ -1,6 +1,7 @@
-import { MongoClient, ObjectID } from 'mongodb'
-import bodyParser from 'body-parser'
-import express from 'express'
+const MongoClient = require('mongodb').MongoClient
+const ObjectID = require('mongodb').ObjectID
+const bodyParser = require('body-parser')
+const express = require('express')
 const app = express()
 const path = require('path')
 const server = require('http').createServer(app)
