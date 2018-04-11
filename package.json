@@ -13,7 +13,7 @@
     "start": "nodemon ./server.js --exec babel-node --presets env,stage-0",
     "dev": "webpack-dev-server --hot --inline --module-bind 'css=style!css'",
     "build_dev": "webpack -p",
-    "build_prod": "webpack -p --env production",
+    "build": "webpack -p --env production",
     "gmp": "npm run -s git-merge-production",
     "git-merge-production": "git checkout production && git pull origin production && git merge master && git push origin production && git checkout master || (git checkout master && echo '>' && echo '> !!!!! FAILED !!!!! DO THE MERGE MANUALLY !!!!!!!!!!!' && echo '>' && exit 1)",
     "deploy-prod": "git push deis-prod production"
