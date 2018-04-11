@@ -6,10 +6,8 @@ const path = require('path')
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 let db
-// const port = process.env.PORT || 3000
-// const dbpath = 'mongodb://localhost:27017/mobsource'
-const port = process.env.PORT || 8080
-const dbpath = 'mongodb://10.142.0.4:27017,10.142.0.5:27017,10.142.0.6:27017/mobsourcelife?replicaSet=rs1'
+const port = process.env.PORT || 3000
+const dbpath = process.env.DB || 'mongodb://localhost:27017/mobsource'
 
 app.use(express.static(path.join(__dirname, '/public')))
 
