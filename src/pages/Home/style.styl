@@ -1,5 +1,6 @@
 #main
   color #59595a
+  position relative
   .header
     width 100%
     height 50px
@@ -17,39 +18,50 @@
         outline none
     .sing-in
       float right
-    .sing-up
-      float left
-  .sign_in_continue
-    text-align center
-    margin-top 60px
+  .online-wrap
+    position fixed
+    top 80px
+    right 20px
+    .count
+      padding 2px 3px
+      line-height 20px
   .data
-    padding 30px
+    padding 30px 30px 30px 20px
     .question
       padding-bottom 10px
     .answer
       padding 2px 5px
-      input
+      font-size 18px
+      div
+        display inline-block
+      input[type=radio]
         position relative
         top 2px
         margin 0 5px
+        border 0px
+        width 16px
+        height 16px
       .result
-        display inline-block
+        position relative
+        top 4px
         margin 0px 70px
         border 1px solid gray
-        padding 0px 20px
+        width 60px
         height 20px
-        background-color #8bc67e
-    .online-wrap
-      width 100%
-      padding 10px 100px
-      h1
-        display inline-block
-        margin 0px 5px
-      .count
-        border 1px solid gray
-        padding 2px 5px
-        line-height 20px
-        background-color #ededee
+        font-size 16px
+        background-color whitesmoke
+        color black
+        span
+          position absolute
+          width 100%
+          text-align center
+          z-index 10
+        .result-fill
+          position absolute
+          background-color #8bc67e
+          height 100%
+          z-index 1
+          left 0
   .clear-button-wrap
     padding 5px 20px
     button
