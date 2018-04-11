@@ -1,7 +1,5 @@
 import { API_VOTE, prefix, API_GET_USER } from 'consts/routes'
-import AlreadyVoted from 'components/AlreadyVoted'
 import ModalSignIn from 'components/ModalSignIn'
-import ModalSignUp from 'components/ModalSignUp'
 import cookie from 'react-cookies'
 import io from 'socket.io-client'
 import req from 'utils/req'
@@ -46,22 +44,20 @@ export default class Home extends React.Component {
 
   }
   vote = e => {
-    if (this.state.isAuth) {
-      req.post(API_VOTE, {option: e, user_id: this.state.id}, true)
-        .then(r => {
-          if (r.message === 'User voted successfully') {
-            this.setState({res: {
-              option1: r.result.o1,
-              option2: r.result.o2,
-              option3: r.result.o3
-            },
-            disabled: true}, () => { this.refs[e - 1].checked = true })
-          } else if (r.message === 'User already voted') {
-            this.handleModalAlreadyVoted()
-            this.setState({disabled: true}, () => { this.refs[r.option - 1].checked = true })
-          }
-        })
-    }
+    req.post(API_VOTE, {option: e}, true)
+      .then(r => {
+        if (r.message === 'User voted successfully') {
+          this.setState({res: {
+            option1: r.result.o1,
+            option2: r.result.o2,
+            option3: r.result.o3
+          },
+          disabled: true}, () => { this.refs[`option${e}`].checked = true })
+        } else if (r.message === 'User already voted') {
+          this.handleModalAlreadyVoted()
+          this.setState({disabled: true}, () => { this.refs[`option${e}`].checked = true })
+        }
+      })
   }
   check = e => {
     if (e.key < 4 && e.key > 0) {
@@ -75,22 +71,22 @@ export default class Home extends React.Component {
         this.setState({
           online: obj.online,
           res: {
-            option1: obj.res.o1,
-            option2: obj.res.o2,
-            option3: obj.res.o3
+            option1: obj.result.o1,
+            option2: obj.result.o2,
+            option3: obj.result.o3
           }})
       }
       )
     }
     geData()
     setInterval(() => geData(), 3000)
+    document.addEventListener('keyup', this.check, false)
     const auth = cookie.load('auth')
     if (auth) {
       req.get(API_GET_USER.replace('{id}', auth))
         .then(r => {
           if (r.message === 'Successfully') {
             this.setState({isAuth: true, disabled: false, userName: r.login, id: auth})
-            document.addEventListener('keyup', this.check, false)
           }
         })
     }
@@ -114,51 +110,45 @@ export default class Home extends React.Component {
             option2: 0,
             option3: 0
           }})
+        this.refs.option1.checked = false
+        this.refs.option2.checked = false
+        this.refs.option3.checked = false
         console.log('succes')
       }
     })
   }
-  handleModalSignUp = () => this.setState({isOpenModalSignUp: !this.state.isOpenModalSignUp})
   handleModalSignIn = () => this.setState({isOpenModalSignIn: !this.state.isOpenModalSignIn})
-  handleModalAlreadyVoted = () => this.setState({isOpenModalAlreadyVoted: !this.state.isOpenModalAlreadyVoted})
   render () {
     return (
       <div id='main'>
-        <AlreadyVoted isOpenModalAlreadyVoted={this.state.isOpenModalAlreadyVoted} handleModalAlreadyVoted={this.handleModalAlreadyVoted} />
-        <ModalSignUp isOpenModalSignUp={this.state.isOpenModalSignUp} handleModalSignUp={this.handleModalSignUp} />
         <ModalSignIn isOpenModalSignIn={this.state.isOpenModalSignIn} handleModalSignIn={this.handleModalSignIn}
-          success={(userName, id) => this.setState({disabled: false, isAuth: true, userName, id}, () =>
-            document.addEventListener('keyup', this.check, false))} />
+          success={userName => this.setState({isAuth: true, userName})} />
         <div className='header'>
-          {this.state.isAuth
-            ? <h1>{this.state.userName}</h1>
-            : <button onClick={this.handleModalSignUp} className='sing-up'>Sign Up</button>}
+          {this.state.isAuth && <h1>{this.state.userName}</h1>}
           {this.state.isAuth
             ? <button onClick={this.loguot} className='sing-in'>Logout</button>
             : <button onClick={this.handleModalSignIn} className='sing-in'>Sign In</button>}
         </div>
-        {this.state.isAuth
-          ? <div className='data'>
-            {this.state.data.map((item, k) => (
-              <div key={k}>
-                <h1 className='question'>{item.question}</h1>
-                <div>
-                  {item.answers.map((i, k) => (
-                    <div key={k} className='answer'>
-                      <input type='radio' name={item.question} value={i.isCorrect} ref={k} disabled={this.state.disabled}
-                        onClick={() => this.vote(k + 1)}
-                      />{i.label}<div className='result'>{this.state.res[`option${k + 1}`]}</div><br />
-                    </div>
-                  ))}
-                </div>
+        <div className='data'>
+          {this.state.data.map((item, k) => (
+            <div key={k}>
+              <h1 className='question'>{item.question}</h1>
+              <div>
+                {item.answers.map((i, k) => (
+                  <div key={k} className='answer'>
+                    <input type='radio' name={item.question} value={i.isCorrect} ref={`option${k + 1}`} disabled={this.state.disabled}
+                      onClick={() => this.vote(k + 1)}
+                    />{i.label}<div className='result'>{this.state.res[`option${k + 1}`]}</div><br />
+                  </div>
+                ))}
               </div>
-            ))}
-            <div className='online-wrap'>
-              <h1>Online:</h1>
-              <h1 className='count'>{this.state.online}</h1>
             </div>
+          ))}
+          <div className='online-wrap'>
+            <h1>Online:</h1>
+            <h1 className='count'>{this.state.online}</h1>
           </div>
-          : <h1 className='sign_in_continue'>Please Sign In for continue</h1>}
+        </div>
         {this.state.userName === admin && <div className='clear-button-wrap'>
           <button onClick={this.clear}>Clear Results</button>
         </div>}
