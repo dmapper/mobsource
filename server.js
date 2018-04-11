@@ -3,10 +3,13 @@ import bodyParser from 'body-parser'
 import express from 'express'
 const app = express()
 const path = require('path')
-const port = process.env.PORT || 3000
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 let db
+const port = process.env.PORT || 3000
+const dbpath = 'mongodb://localhost:27017/mobsource'
+// const port = process.env.PORT || 8080
+// const dbpath = 'mongodb://10.142.0.4:27017,10.142.0.5:27017,10.142.0.6:27017/mobsourcelife?replicaSet=rs1'
 
 app.use(express.static(path.join(__dirname, '/public')))
 
@@ -33,6 +36,7 @@ const data = cb => {
   })
 }
 io.on('connection', socket => {
+  data()
   socket.emit('data', { online: io.engine.clientsCount, res })
   socket.on('disconnect', () => {
     socket.emit('data', { online: io.engine.clientsCount, res })
@@ -105,7 +109,7 @@ app.post('/vote', (req, res) => {
           }
         })
       } else {
-        res.send({message: 'User already voted'})
+        res.send({message: 'User already voted', option: +docs.option})
       }
     }
   })
@@ -133,7 +137,7 @@ app.get('/user/:id', (req, res) => {
   })
 })
 
-MongoClient.connect('mongodb://localhost:27017/mobsource', (err, database) => {
+MongoClient.connect(dbpath, (err, database) => {
   if (err) return console.log(err)
   db = database.db('dbo')
   server.listen(port, () => {
