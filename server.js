@@ -48,13 +48,6 @@ io.on('connection', socket => {
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3001')
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE')
-  next()
-})
-
 app.post('/vote', (req, res) => {
   db.collection('mobsourcelifevotes').findOne({user_id: req.body.user_id}, (err, docs) => {
     if (err) {
@@ -82,8 +75,6 @@ app.post('/vote', (req, res) => {
       }
     }
   })
-  // result[`o${req.body.option}`]++
-  // res.send({message: 'User voted successfully', result})
 })
 app.delete('/vote', (req, res) => {
   db.collection('mobsourcelifevotes').remove({ }, err => {
@@ -95,8 +86,6 @@ app.delete('/vote', (req, res) => {
       res.send({message: 'Voting results are deleted'})
     }
   })
-  // result = {o1: 0, o2: 0, o3: 0}
-  // res.send({message: 'Voting results are deleted', result})
 })
 
 MongoClient.connect(dbpath, (err, database) => {
