@@ -13,8 +13,7 @@ Open http://localhost:3001
 ```
 ### Build
 ```
-npm run build_dev
-npm run build_prod
+npm run build
 ```
 ### Watch
 ```
