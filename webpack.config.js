@@ -1,13 +1,11 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const webpack = require('webpack')
 const path = require('path')
 const alias = {
   'components': path.resolve('./src/components'),
   'consts': path.resolve('./src/consts'),
   'utils': path.resolve('./src/utils')
 }
-module.exports = env => {
-  // const production = env === 'production'
+module.exports = () => {
   let outputCSS = 'bundle.css'
   let outputJS = 'bundle.js'
   return ({
@@ -16,7 +14,7 @@ module.exports = env => {
       path: path.resolve(__dirname, 'public', './'),
       filename: outputJS
     },
-    devtool: false, // production ? false : 'source-map',
+    devtool: false,
     module: {
       rules: [
         {
@@ -63,12 +61,7 @@ module.exports = env => {
       port: '3001'
     },
     plugins: [
-      new ExtractTextPlugin(outputCSS),
-      new webpack.DefinePlugin({
-        'process.env': {
-          NODE_ENV: JSON.stringify(env)
-        }
-      })
+      new ExtractTextPlugin(outputCSS)
     ],
     resolve: {
       alias: alias

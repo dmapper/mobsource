@@ -13,9 +13,10 @@ export default class Home extends React.Component {
     isOpenModalSignIn: false,
     userName: '',
     online: 0,
+    active: 0,
     data: [
       {
-        question: 'Please select a choice only if you are confident of your response',
+        question: 'Please select a choice only if you are confident of your response (You can choose by entering 1, 2, 3 on your keyboard) The admin will reset results after every question',
         answers: [
           {
             label: 'option 1',
@@ -43,7 +44,12 @@ export default class Home extends React.Component {
     req.post(API_VOTE, {option: e, user_id: cookie.load('auth')}, true)
       .then(r => {
         if (r.message === 'User voted successfully') {
+          let a = 0
+          if (r.result.o1 > a) a = 1
+          if (r.result.o2 > a) a = 2
+          if (r.result.o3 > a) a = 3
           this.setState({
+            active: a,
             sum: r.result.o1 + r.result.o2 + r.result.o3,
             res: {
               option1: r.result.o1,
@@ -57,7 +63,12 @@ export default class Home extends React.Component {
     const geData = () => {
       socket.emit('update', () => { })
       socket.on('data', obj => {
+        let a = 0
+        if (obj.result.o1 > a) a = 1
+        if (obj.result.o2 > a) a = 2
+        if (obj.result.o3 > a) a = 3
         this.setState({
+          active: a,
           online: obj.online,
           sum: obj.result.o1 + obj.result.o2 + obj.result.o3,
           res: {
@@ -80,6 +91,7 @@ export default class Home extends React.Component {
     req.delete(API_VOTE).then(r => {
       if (r.message === 'Voting results are deleted') {
         this.setState({
+          active: 0,
           sum: 0,
           res: {
             option1: 0,
@@ -107,7 +119,6 @@ export default class Home extends React.Component {
   loguot = () => this.setState({userName: ''}, () => cookie.remove('auth_admin'))
   render () {
     const isAuth = this.state.userName === 'admin'
-    console.log(cookie.load('auth'))
     return (
       <div id='main'>
         <ModalSignIn isOpenModalSignIn={this.state.isOpenModalSignIn} handleModalSignIn={this.handleModalSignIn}
@@ -128,13 +139,15 @@ export default class Home extends React.Component {
               <div>
                 {item.answers.map((i, k) => (
                   <div key={k} className='answer'>
-                    <div onClick={() => this.vote(k + 1)}>
+                    <div onClick={() => this.vote(k + 1)} className='inline-op'>
                       <input type='radio' name={item.question} value={i.isCorrect} ref={`option${k + 1}`} />
                       {i.label}
                     </div>
-                    <div className='result'><div className='result-fill'
-                      style={{width: `${(this.state.res[`option${k + 1}`] / (this.state.sum !== 0 ? this.state.sum : 1)) * 100}%`}}
-                    /><span>{this.state.res[`option${k + 1}`]}</span></div><br />
+                    <div className='inline-an'>
+                      {(this.state.active === k + 1) && <div className='result'><div className='result-fill'
+                        style={{width: `${(this.state.res[`option${k + 1}`] / (this.state.sum !== 0 ? this.state.sum : 1)) * 100}%`}}
+                      /><span>{this.state.res[`option${k + 1}`]}</span></div>}<br />
+                    </div>
                   </div>
                 ))}
               </div>
